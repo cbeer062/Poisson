@@ -1,0 +1,66 @@
+FROM python:3.6-stretch
+ 	 
+ 	WORKDIR /app
+ 	 
+ 	COPY . /app
+ 	 
+ 	# Install any needed packages specified in requirements.txt
+ 	RUN pip install --trusted-host pypi.python.org -r requirements.txt
+ 	 
+ 	RUN apt-get -y update && apt-get install -y \
+ 	python-minimal \
+ 	apt-utils \
+ 	apt-transport-https \
+ 	python-dev \
+ 	build-essential \
+ 	curl \
+ 	libpq-dev \
+ 	swig \
+ 	&& rm -rf /var/lib/apt/lists/* \
+ 	&& apt-get clean -y
+ 	# libpq-dev is postgres
+ 	 
+ 	# Microsoft ODBC Driver Install for Debian 9 (Stretch)
+ 	RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+ 	RUN curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list
+ 	RUN apt-get update
+ 	RUN ACCEPT_EULA=Y apt-get install -y msodbcsql17
+ 	 
+ 	# FreeTDS Open-Source Driver
+ 	RUN apt-get install -y unixodbc unixodbc-dev tdsodbc libssl-dev \
+ 	&& apt-get clean -y
+ 	 
+ 	# FreeTDS Configuration
+ 	RUN echo "[FreeTDS]\n\
+ 	Description = FreeTDS unixODBC Driver\n\
+ 	Driver = /usr/lib/x86_64-linux-gnu/odbc/libtdsodbc.so\n\
+ 	Setup = /usr/lib/x86_64-linux-gnu/odbc/libtdsS.so" >> /etc/odbcinst.ini
+ 	# /usr/lib/arm-linux-gnueabi/odbc/libtdsodbc.so\n\ # dpkg --search libtdsodbc.so
+ 	# /usr/lib/arm-linux-gnueabi/odbc/libtdsS.so" >> /etc/odbcinst.ini 
+ 	# dpkg --search libtdsS.so or maybe just: sudo dpkg-reconfigure tdsodbc
+ 	 
+ 	 
+ 	 
+ 	# not a pretty as a requirements.txt, but quick to follow
+ 	RUN pip install --upgrade pip
+ 	RUN pip install --upgrade setuptools
+ 	RUN pip install os
+ 	RUN pip install csv
+ 	RUN pip install re
+ 	RUN pip install logging
+ 	RUN pip install optparse
+ 	RUN pip install dedupe
+ 	RUN pip install unidecode
+ 	RUN pip install codecs
+ 	RUN pip install recordlinkage
+ 	RUN pip install pandas
+ 	RUN pip install numpy
+ 	RUN pip install io
+ 	RUN pip install time
+ 	RUN pip install azure.storage.blob
+ 	RUN pip install pyodbc
+	RUN pip install scipy
+	RUN pip install datetime
+ 	 
+ 	CMD [ "python", "./Poisson_test.py" ]
+ 
